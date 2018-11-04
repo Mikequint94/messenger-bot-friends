@@ -24,6 +24,9 @@ app.post('/webhook', (req, res) => {
       // will only ever contain one message, so we get index 0
       let webhook_event = entry.messaging[0];
       console.log(webhook_event);
+      if (webhook_event.message === 'hello') {
+        console.log('Hello! How are you?');
+      }
     });
 
     // Returns a '200 OK' response to all requests
@@ -39,7 +42,7 @@ app.post('/webhook', (req, res) => {
 app.get('/webhook', (req, res) => {
 
   // Your verify token. Should be a random string.
-  let VERIFY_TOKEN = "<YOUR_VERIFY_TOKEN>"
+  let VERIFY_TOKEN = "a4b8c15d16e23f42"
     
   // Parse the query params
   let mode = req.query['hub.mode'];
