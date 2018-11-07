@@ -84,17 +84,18 @@ function handleMessage(sender_psid, received_message) {
 
   let lovingMessages = ['i love You', '143', 'i <3 you', 'i love u', 'i love you so much'];
   // Check if the message contains text
-  if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
-    response = {
-      "text": `I LOVE YOU TOO!!!`
-    };
-  }
   if (received_message.text) {    
+    if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
+      response = {
+        "text": `I LOVE YOU TOO!!!`
+      };
+    } else {
+      // Create the payload for a basic text message
+      response = {
+        "text": `:) You sent the message: "${received_message.text}".  <3 Now send me an image! :P`
+      };
+    }
 
-    // Create the payload for a basic text message
-    response = {
-      "text": `Thanks Chy <3 You sent the message: "${received_message.text}". Now send me an image!`
-    };
   } else if (received_message.attachments) {
     
       // Gets the URL of the message attachment
@@ -123,7 +124,7 @@ function handleMessage(sender_psid, received_message) {
           }]
         }
       }
-    }
+    };
     
   }   
   // Sends the response message
