@@ -82,15 +82,50 @@ function handleMessage(sender_psid, received_message) {
 
   let response;
 
+  let lovingMessages = ['i love You', '143', 'i <3 you', 'i love u', 'i love you so much'];
   // Check if the message contains text
+  if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
+    response = {
+      "text": `I LOVE YOU TOO!!!`
+    };
+  }
   if (received_message.text) {    
 
     // Create the payload for a basic text message
     response = {
-      "text": `You sent the message: "${received_message.text}". Now send me an image!`
+      "text": `Thanks Chy <3 You sent the message: "${received_message.text}". Now send me an image!`
     };
-  }  
-  
+  } else if (received_message.attachments) {
+    
+      // Gets the URL of the message attachment
+      let attachment_url = received_message.attachments[0].payload.url;
+      response = {
+      "attachment": {
+        "type": "template",
+        "payload": {
+          "template_type": "generic",
+          "elements": [{
+            "title": "Is this the right picture Johnny?",
+            "subtitle": "Tap a button to answer.",
+            "image_url": attachment_url,
+            "buttons": [
+              {
+                "type": "postback",
+                "title": "Yes Pa Pa!",
+                "payload": "yes",
+              },
+              {
+                "type": "postback",
+                "title": "No Pa Pa!",
+                "payload": "no",
+              }
+            ],
+          }]
+        }
+      }
+    }
+    
+  }   
   // Sends the response message
   callSendAPI(sender_psid, response);    
 }
