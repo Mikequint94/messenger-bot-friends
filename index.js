@@ -81,13 +81,17 @@ app.get('/webhook', (req, res) => {
 function handleMessage(sender_psid, received_message) {
 
   let response;
-
-  let lovingMessages = ['i love You', '143', 'i <3 you', 'i love u', 'i love you so much'];
+  let greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
+  let lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
   // Check if the message contains text
   if (received_message.text) {    
     if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": `I LOVE YOU TOO!!!`
+      };
+    } else if (greetings.indexOf(received_message.text.toLowerCase()) !== -1) {
+      response = {
+        "text": greetings[Math.floor(Math.random()*(greetings.length - 1))]
       };
     } else {
       // Create the payload for a basic text message
