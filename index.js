@@ -5,6 +5,7 @@ const
   express = require('express'),
   bodyParser = require('body-parser'),
   app = express().use(bodyParser.json()), // creates express http server
+  request = require('request'),
   PAGE_ACCESS_TOKEN = "EAAIZANhHSqH4BAI7Y9Q6EAHH9DCNSWmRw9vVTXIjW6B4ZBBASOKeLc3CYLcmoZCCFLiSUnarTkWpDFiJKblPPShtYpbHhZCnFTa7fIzKK0mWZBFwBgrXv4BbpCPy8lZB4PINyQg06vpzTORPlOAbMazKAcRzZA3mfSNl6DkMm4degZDZD";
 
 // Sets server port and logs message on success
@@ -29,8 +30,13 @@ app.post('/webhook', (req, res) => {
       // Get the sender PSID
       let sender_psid = webhook_event.sender.id;
       console.log('Sender PSID: ' + sender_psid);
-      if (webhook_event.message === 'hello') {
-        console.log('Hello! How are you?');
+      
+      // Check if the event is a message or postback and
+      // pass the event to the appropriate handler function
+      if (webhook_event.message) {
+        handleMessage(sender_psid, webhook_event.message);        
+      } else if (webhook_event.postback) {
+        handlePostback(sender_psid, webhook_event.postback);
       }
     });
 
@@ -74,6 +80,19 @@ app.get('/webhook', (req, res) => {
 // Handles messages events
 function handleMessage(sender_psid, received_message) {
 
+  let response;
+
+  // Check if the message contains text
+  if (received_message.text) {    
+
+    // Create the payload for a basic text message
+    response = {
+      "text": `You sent the message: "${received_message.text}". Now send me an image!`
+    };
+  }  
+  
+  // Sends the response message
+  callSendAPI(sender_psid, response);    
 }
 
 // Handles messaging_postbacks events
@@ -83,5 +102,25 @@ function handlePostback(sender_psid, received_postback) {
 
 // Sends response messages via the Send API
 function callSendAPI(sender_psid, response) {
+  // Construct the message body
+  let request_body = {
+    "recipient": {
+      "id": sender_psid
+    },
+    "message": response
+  };
   
+  // Send the HTTP request to the Messenger Platform
+  request({
+    "uri": "https://graph.facebook.com/v2.6/me/messages",
+    "qs": { "access_token": PAGE_ACCESS_TOKEN },
+    "method": "POST",
+    "json": request_body
+  }, (err, res, body) => {
+    if (!err) {
+      console.log('message sent!');
+    } else {
+      console.error("Unable to send message:" + err);
+    }
+  }); 
 }
