@@ -119,8 +119,13 @@ function handleMessage(sender_psid, received_message) {
         response = {
           "text":  `OK.  I will remind you ${reminderText}`
         };
-        client.connect();
-        client.query(`INSERT INTO reminders (id, username, task) VALUES (2, 32, ${reminderText});`, (err, res) => {
+        const client2 = new Client({
+          connectionString: process.env.DATABASE_URL,
+          ssl: true,
+        });
+
+        client2.connect();
+        client2.query(`INSERT INTO reminders (id, username, task) VALUES (2, 32, ${reminderText});`, (err, res) => {
           if (err) {
             console.log(err);
           }
@@ -130,7 +135,7 @@ function handleMessage(sender_psid, received_message) {
               console.log(JSON.stringify(row));
             });
           }
-          client.end();
+          client2.end();
         });
     } else {
       // Create the payload for a basic text message
