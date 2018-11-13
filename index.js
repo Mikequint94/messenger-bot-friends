@@ -102,8 +102,9 @@ app.get('/webhook', (req, res) => {
 function handleMessage(sender_psid, received_message) {
 
   let response;
-  let greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
-  let lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
+  const greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
+  const lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
+  let reminderText = isReminder(received_message.text.toLowerCase());
   // Check if the message contains text
   if (received_message.text) {
     if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
@@ -114,6 +115,22 @@ function handleMessage(sender_psid, received_message) {
       response = {
         "text": greetings[Math.floor(Math.random()*(greetings.length - 1))]
       };
+    } else if (reminderText) {
+        response = {
+          "text":  `OK.  I will remind you ${reminderText}`
+        };
+        client.query(`INSERT INTO reminders (id, username, task) VALUES (2, 32, ${reminderText});`, (err, res) => {
+          if (err) {
+            throw err;
+          }
+          console.log(res);
+          if (res.rows) {
+            res.rows.forEach(row => {
+              console.log(JSON.stringify(row));
+            });
+          }
+          client.end();
+        });
     } else {
       // Create the payload for a basic text message
       response = {
@@ -155,6 +172,18 @@ function handleMessage(sender_psid, received_message) {
   }
   // Sends the response message
   callSendAPI(sender_psid, response);
+}
+
+function isReminder(inputText) {
+  const setReminders = ['set a reminder', 'set reminder', 'remind me', 'make a reminder', 'make reminder'];
+  var reminderBody = '';
+  setReminders.forEach((reminderIntro) => {
+    if (inputText.indexOf(reminderIntro) !== -1) {
+      console.log(inputText, reminderIntro);
+      reminderBody = inputText.slice(reminderIntro.length + 1);
+    }
+  });
+  return reminderBody;
 }
 
 // Handles messaging_postbacks events
