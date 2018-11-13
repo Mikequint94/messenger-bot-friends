@@ -13,6 +13,8 @@ app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 const { Client } = require('pg');
 
+let queryId = 5;
+
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: true,
@@ -123,9 +125,9 @@ function handleMessage(sender_psid, received_message) {
           connectionString: process.env.DATABASE_URL,
           ssl: true,
         });
-
+        queryId = queryId + 1;
         client2.connect();
-        client2.query(`INSERT INTO reminders (id, username, task) VALUES (2, 32, ${reminderText});`, (err, res) => {
+        client2.query(`INSERT INTO reminders (id, username, task) VALUES (${queryId}, 32, '${reminderText}');`, (err, res) => {
           if (err) {
             console.log(err);
           }
