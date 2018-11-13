@@ -11,9 +11,30 @@ const
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
-// Creates the endpoint for our webhook 
-app.post('/webhook', (req, res) => {  
- 
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
+});
+
+client.connect();
+
+client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+  if (err) {
+    throw err;
+  }
+  if (res.rows) {
+    res.rows.forEach(row => {
+      console.log(JSON.stringify(row));
+    });
+  }
+  client.end();
+});
+
+// Creates the endpoint for our webhook
+app.post('/webhook', (req, res) => {
+
   let body = req.body;
 
   // Checks this is an event from a page subscription
@@ -22,19 +43,19 @@ app.post('/webhook', (req, res) => {
     // Iterates over each entry - there may be multiple if batched
     body.entry.forEach(function(entry) {
 
-      // Gets the message. entry.messaging is an array, but 
+      // Gets the message. entry.messaging is an array, but
       // will only ever contain one message, so we get index 0
       let webhook_event = entry.messaging[0];
       console.log(webhook_event);
-      
+
       // Get the sender PSID
       let sender_psid = webhook_event.sender.id;
       console.log('Sender PSID: ' + sender_psid);
-      
+
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
       if (webhook_event.message) {
-        handleMessage(sender_psid, webhook_event.message);        
+        handleMessage(sender_psid, webhook_event.message);
       } else if (webhook_event.postback) {
         handlePostback(sender_psid, webhook_event.postback);
       }
@@ -54,25 +75,25 @@ app.get('/webhook', (req, res) => {
 
   // Your verify token. Should be a random string.
   const VERIFY_TOKEN = "a4b8c15d16e23f42";
-    
+
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];
   let challenge = req.query['hub.challenge'];
-    
+
   // Checks if a token and mode is in the query string of the request
   if (mode && token) {
-  
+
     // Checks the mode and token sent is correct
     if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-      
+
       // Responds with the challenge token from the request
       console.log('WEBHOOK_VERIFIED');
       res.status(200).send(challenge);
-    
+
     } else {
       // Responds with '403 Forbidden' if verify tokens do not match
-      res.sendStatus(403);      
+      res.sendStatus(403);
     }
   }
 });
@@ -84,7 +105,7 @@ function handleMessage(sender_psid, received_message) {
   let greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
   let lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
   // Check if the message contains text
-  if (received_message.text) {    
+  if (received_message.text) {
     if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": `I LOVE YOU TOO!!!`
@@ -101,7 +122,7 @@ function handleMessage(sender_psid, received_message) {
     }
 
   } else if (received_message.attachments) {
-    
+
       // Gets the URL of the message attachment
       let attachment_url = received_message.attachments[0].payload.url;
       console.log(attachment_url);
@@ -130,16 +151,16 @@ function handleMessage(sender_psid, received_message) {
         }
       }
     };
-    
-  }   
+
+  }
   // Sends the response message
-  callSendAPI(sender_psid, response);    
+  callSendAPI(sender_psid, response);
 }
 
 // Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
   let response;
-    
+
   // Get the payload for the postback
   let payload = received_postback.payload;
 
@@ -162,7 +183,7 @@ function callSendAPI(sender_psid, response) {
     },
     "message": response
   };
-  
+
   // Send the HTTP request to the Messenger Platform
   request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
@@ -175,5 +196,5 @@ function callSendAPI(sender_psid, response) {
     } else {
       console.error("Unable to send message:" + err);
     }
-  }); 
+  });
 }
