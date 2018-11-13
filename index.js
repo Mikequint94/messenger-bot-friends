@@ -119,9 +119,10 @@ function handleMessage(sender_psid, received_message) {
         response = {
           "text":  `OK.  I will remind you ${reminderText}`
         };
+        client.connect();
         client.query(`INSERT INTO reminders (id, username, task) VALUES (2, 32, ${reminderText});`, (err, res) => {
           if (err) {
-            throw err;
+            console.log(err);
           }
           console.log(res);
           if (res.rows) {
