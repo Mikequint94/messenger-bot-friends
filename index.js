@@ -192,12 +192,13 @@ function readReminders(senderId) {
     }
     if (res.rows) {
       res.rows.forEach(row => {
-        response += row + '\n';
+        response += row.task + '\n';
         console.log(JSON.stringify(row));
       });
     }
     client.end();
   });
+  console.log(response);
   return response;
 }
 
