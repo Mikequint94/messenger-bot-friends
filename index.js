@@ -193,6 +193,9 @@ function readReminders(senderId) {
     if (res.rows) {
       res.rows.forEach(row => {
         response += row.task + '\n';
+        callSendAPI(senderId, {
+          "text": row.task
+        });
         console.log(JSON.stringify(row));
       });
     }
