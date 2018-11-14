@@ -13,27 +13,6 @@ app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 const { Client } = require('pg');
 
-let queryId = 5;
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
-
-client.connect();
-
-client.query('SELECT * FROM reminders;', (err, res) => {
-  if (err) {
-    throw err;
-  }
-  if (res.rows) {
-    res.rows.forEach(row => {
-      console.log(JSON.stringify(row));
-    });
-  }
-  client.end();
-});
-
 // Creates the endpoint for our webhook
 app.post('/webhook', (req, res) => {
 
@@ -123,6 +102,10 @@ function handleMessage(sender_psid, received_message) {
           "text":  `OK.  I will remind you ${reminderText}`
         };
         setReminder(reminderText, sender_psid.toString());
+    } else if (requestReminders.indexOf(received_message.text.toLowerCase()) !== -1) {
+        response = {
+          "text":  readReminders(sender_psid.toString())
+        };
     } else {
       // Create the payload for a basic text message
       response = {
@@ -178,13 +161,12 @@ function isReminder(inputText) {
   return reminderBody;
 }
 function setReminder(reminderText, senderId) {
-  const client2 = new Client({
+  const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true,
   });
-  // queryId = queryId + 1;
-  client2.connect();
-  client2.query(`INSERT INTO reminders (username, task) VALUES ('${senderId}', '${reminderText}');`, (err, res) => {
+  client.connect();
+  client.query(`INSERT INTO reminderList (username, task) VALUES ('${senderId}', '${reminderText}');`, (err, res) => {
     if (err) {
       console.log(err);
     }
@@ -194,8 +176,29 @@ function setReminder(reminderText, senderId) {
         console.log(JSON.stringify(row));
       });
     }
-    client2.end();
+    client.end();
   });
+}
+function readReminders(senderId) {
+  let response = 'Here are your reminders \n';
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  });
+  client.connect();
+  client.query(`SELECT * FROM reminderList WHERE username = ${senderId};`, (err, res) => {
+    if (err) {
+      throw err;
+    }
+    if (res.rows) {
+      res.rows.forEach(row => {
+        response += row + '\n';
+        console.log(JSON.stringify(row));
+      });
+    }
+    client.end();
+  });
+  return response;
 }
 
 // Handles messaging_postbacks events
