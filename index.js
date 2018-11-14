@@ -7,6 +7,8 @@ const
   app = express().use(bodyParser.json()), // creates express http server
   request = require('request'),
   PAGE_ACCESS_TOKEN = "EAAIZANhHSqH4BAI7Y9Q6EAHH9DCNSWmRw9vVTXIjW6B4ZBBASOKeLc3CYLcmoZCCFLiSUnarTkWpDFiJKblPPShtYpbHhZCnFTa7fIzKK0mWZBFwBgrXv4BbpCPy8lZB4PINyQg06vpzTORPlOAbMazKAcRzZA3mfSNl6DkMm4degZDZD";
+const schedule = require('node-schedule');
+
 
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
@@ -93,6 +95,16 @@ function handleMessage(sender_psid, received_message) {
       response = {
         "text": `I LOVE YOU TOO!!!`
       };
+      var j = schedule.scheduleJob('30 * * * *', function(){
+        callSendAPI(sender_psid, {
+          "text": 'The answer to life, the universe, and everything!'
+        });
+      });
+      var k = schedule.scheduleJob('29 * * * *', function(){
+        callSendAPI(sender_psid, {
+          "text": 'Its the 29th min'
+        });
+      });
     } else if (greetings.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": greetings[Math.floor(Math.random()*(greetings.length - 1))]
@@ -150,7 +162,7 @@ function handleMessage(sender_psid, received_message) {
 }
 
 function isReminder(inputText) {
-  const setReminders = ['set a reminder', 'set reminder', 'remind me', 'make a reminder', 'make reminder'];
+  const setReminders = ['please remind me', 'set a reminder', 'set reminder', 'remind me', 'make a reminder', 'make reminder'];
   var reminderBody = '';
   setReminders.forEach((reminderIntro) => {
     if (inputText.indexOf(reminderIntro) !== -1) {
