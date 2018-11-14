@@ -106,6 +106,7 @@ function handleMessage(sender_psid, received_message) {
   let response;
   const greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
   const lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
+  const requestReminders = ['what are my reminders?', 'reminders list', 'tell me my reminders'];
   let reminderText = isReminder(received_message.text.toLowerCase());
   // Check if the message contains text
   if (received_message.text) {
@@ -121,24 +122,7 @@ function handleMessage(sender_psid, received_message) {
         response = {
           "text":  `OK.  I will remind you ${reminderText}`
         };
-        const client2 = new Client({
-          connectionString: process.env.DATABASE_URL,
-          ssl: true,
-        });
-        queryId = queryId + 1;
-        client2.connect();
-        client2.query(`INSERT INTO reminders (id, username, task) VALUES (${queryId}, 32, '${reminderText}');`, (err, res) => {
-          if (err) {
-            console.log(err);
-          }
-          console.log(res);
-          if (res.rows) {
-            res.rows.forEach(row => {
-              console.log(JSON.stringify(row));
-            });
-          }
-          client2.end();
-        });
+        setReminder(reminderText, sender_psid);
     } else {
       // Create the payload for a basic text message
       response = {
@@ -192,6 +176,26 @@ function isReminder(inputText) {
     }
   });
   return reminderBody;
+}
+function setReminder(reminderText, senderId) {
+  const client2 = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  });
+  // queryId = queryId + 1;
+  client2.connect();
+  client2.query(`INSERT INTO reminders (username, task) VALUES ('${senderId}', '${reminderText}');`, (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(res);
+    if (res.rows) {
+      res.rows.forEach(row => {
+        console.log(JSON.stringify(row));
+      });
+    }
+    client2.end();
+  });
 }
 
 // Handles messaging_postbacks events
