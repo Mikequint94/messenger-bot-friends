@@ -186,7 +186,7 @@ function readReminders(senderId) {
     ssl: true,
   });
   client.connect();
-  client.query(`SELECT * FROM reminderList WHERE username = ${senderId};`, (err, res) => {
+  client.query(`SELECT * FROM reminderList WHERE username = '${senderId}';`, (err, res) => {
     if (err) {
       throw err;
     }
