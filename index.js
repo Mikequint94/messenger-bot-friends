@@ -95,12 +95,12 @@ function handleMessage(sender_psid, received_message) {
       response = {
         "text": `I LOVE YOU TOO!!!`
       };
-      var j = schedule.scheduleJob('30 * * * *', function(){
+      var j = schedule.scheduleJob('32 * * * *', function(){
         callSendAPI(sender_psid, {
           "text": 'The answer to life, the universe, and everything!'
         });
       });
-      var k = schedule.scheduleJob('29 * * * *', function(){
+      var k = schedule.scheduleJob('33 * * * *', function(){
         callSendAPI(sender_psid, {
           "text": 'Its the 29th min'
         });
