@@ -85,10 +85,10 @@ function handleMessage(sender_psid, received_message) {
   let response;
   const greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
   const lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
-  const requestReminders = ['what are my reminders?', 'reminders list', 'tell me my reminders'];
-  let reminderText = isReminder(received_message.text.toLowerCase());
+  const requestReminders = ['what are my reminders?', 'reminders list', 'tell me my reminders', 'what do I have scheduled?', 'reminders?'];
   // Check if the message contains text
   if (received_message.text) {
+    let reminderText = isReminder(received_message.text.toLowerCase());
     if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": `I LOVE YOU TOO!!!`
