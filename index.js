@@ -122,7 +122,7 @@ function handleMessage(sender_psid, received_message) {
         response = {
           "text":  `OK.  I will remind you ${reminderText}`
         };
-        setReminder(reminderText, sender_psid);
+        setReminder(reminderText, sender_psid.toString());
     } else {
       // Create the payload for a basic text message
       response = {
