@@ -8,6 +8,7 @@ const
   request = require('request'),
   PAGE_ACCESS_TOKEN = "EAAIZANhHSqH4BAI7Y9Q6EAHH9DCNSWmRw9vVTXIjW6B4ZBBASOKeLc3CYLcmoZCCFLiSUnarTkWpDFiJKblPPShtYpbHhZCnFTa7fIzKK0mWZBFwBgrXv4BbpCPy8lZB4PINyQg06vpzTORPlOAbMazKAcRzZA3mfSNl6DkMm4degZDZD";
 const schedule = require('node-schedule');
+const chrono = require('chrono-node');
 
 
 // Sets server port and logs message on success
@@ -173,6 +174,10 @@ function isReminder(inputText) {
   return reminderBody;
 }
 function setReminder(reminderText, senderId) {
+  var dateInfo = chrono.parseDate(reminderText);
+  console.log('!!!!!!!!!!!!');
+  console.log(dateInfo);
+  console.log('!!!!!!!!!!!!');
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true,
