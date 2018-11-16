@@ -10,6 +10,8 @@ const
 const schedule = require('node-schedule');
 const chrono = require('chrono-node');
 const { Client } = require('pg');
+let setListName = {};
+
 
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
@@ -70,7 +72,6 @@ app.get('/webhook', (req, res) => {
 function handleMessage(sender_psid, received_message) {
   let response;
   let senderId = sender_psid.toString();
-  let setListName = {};
   const greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy', 'heyyy', 'whats up', 'what\'s up'];
   const lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
   const requestReminders = ['what are my reminders?', 'what are my reminders', 'reminders list', 'tell me my reminders', 'what do I have scheduled?', 'reminders?'];
