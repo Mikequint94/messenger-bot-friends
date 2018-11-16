@@ -75,12 +75,15 @@ function handleMessage(sender_psid, received_message) {
   const lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
   const requestReminders = ['what are my reminders?', 'what are my reminders', 'reminders list', 'tell me my reminders', 'what do I have scheduled?', 'reminders?'];
   const helpRequest = ['help', 'help me', 'what can you do?', 'what can you do'];
-  const friendListRequest = ['start a list with friends', 'make a new friend list', 'make list with friends', 'make list with a friend', 'new friend list', 'start a new list with a friend', 'make new list', 'new list', 'make new friend list'];
+  const friendListRequest = ['start a list with friends', 'make a new friend list', 'make list with friends', 'make list with a friend', 'new friend list', 'start a new list with a friend', 'make new list', 'new list', 'make new friend list', 'start list with friend', 'start a list with a friend'];
   // Check if the message contains text
   if (received_message.text) {
-    if (setListName.senderId) {
+    console.log('*********');
+    console.log(setListName, JSON.stringify(setListName), setListName[senderId]);
+    console.log('*********');
+    if (setListName[senderId]) {
       let listName = received_message.text;
-      // let randomString = 
+      // let randomString =
       response = {
         "text": `Very well.  Have your friend message me the following string to create the joint list.`
       };
