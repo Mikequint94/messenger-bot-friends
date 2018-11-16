@@ -102,6 +102,9 @@ function handleMessage(sender_psid, received_message) {
       response = {
         "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName}`
       };
+      // reset connectorCode to false for this string so it can be reused
+      //instead of adding onto it, now is when you need to store to database
+      // then instruct on how to use and message both ppl the instructions
       connectorCode[received_message.text].joinerId = senderId;
     } else if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
