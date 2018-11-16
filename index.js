@@ -16,6 +16,7 @@ const requestReminders = ['what are my reminders?', 'what are my reminders', 're
 const helpRequest = ['help', 'help me', 'what can you do?', 'what can you do'];
 const friendListRequest = ['start a list with friends', 'make a new friend list', 'make list with friends', 'make list with a friend', 'new friend list', 'start a new list with a friend', 'make new list', 'new list', 'make new friend list', 'start list with friend', 'start a list with a friend', 'start new list', 'start a new list'];
 let setListName = {};
+let connectorCode = {};
 
 
 // Sets server port and logs message on success
@@ -82,17 +83,26 @@ function handleMessage(sender_psid, received_message) {
     console.log('*********');
     console.log(setListName, JSON.stringify(setListName), setListName[senderId]);
     console.log('*********');
+    console.log(connectorCode, JSON.stringify(connectorCode));
+    console.log('*********');
     let reminderText = isReminder(received_message.text.toLowerCase());
     if (setListName[senderId]) {
-      let listName = received_message.text;
-      let randomString = Math.random().toString(36).substring(7);
+      setListName[senderId] = false;
       response = {
         "text": `Very well.  Have your friend message me the following string to create the joint list.`
       };
       callSendAPI(sender_psid, response);
+      let listName = received_message.text;
+      let randomString = Math.random().toString(36).substring(5);
       response = {
         "text": randomString
       };
+      connectorCode[randomString] = {creatorListName: listName, creatorId: senderId};
+    } else if (received_message.text.length === 8 && connectorCode[received_message.text]) {
+      response = {
+        "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName}`
+      };
+      connectorCode[received_message.text].joinerId = senderId;
     } else if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": `I LOVE YOU TOO!!!`
