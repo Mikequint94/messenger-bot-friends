@@ -96,8 +96,8 @@ function handleMessage(sender_psid, received_message) {
       connectorCode[randomString] = {creatorListName: listName, creatorId: senderId};
     } else if (joinerSetListName[senderId]) {
       joinerSetListName[senderId] = false;
-      let joinerListName = received_message.text;
       let newTableObject = connectorCode[Object.keys(connectorCode).find(key => connectorCode[key].joinerId === senderId)];
+      newTableObject.joinerListName = received_message.text;
       console.log('*******');
       console.log(newTableObject);
       console.log('*******');
@@ -207,9 +207,7 @@ function setReminder(reminderText, senderId) {
   });
   client.connect();
   client.query(`INSERT INTO reminderList (username, task) VALUES ('${senderId}', '${reminderText}');`, (err, res) => {
-    if (err) {
-      console.log(err);
-    }
+    if (err) {  console.log(err);  }
     console.log(res);
     if (res.rows) {
       res.rows.forEach(row => {
@@ -227,15 +225,14 @@ function readReminders(senderId) {
   });
   client.connect();
   client.query(`SELECT * FROM reminderList WHERE username = '${senderId}' ORDER BY id;`, (err, res) => {
-    if (err) {
-      throw err;
-    }
+    if (err) {throw err;}
     if (res.rows) {
+      let listItems = '';
       res.rows.forEach(row => {
-        callSendAPI(senderId, {
-          "text": row.task
-        });
-        console.log(JSON.stringify(row));
+        listItems += row.task + '\n';
+      });
+      callSendAPI(senderId, {
+        "text": listItems
       });
     }
     client.end();
@@ -244,7 +241,28 @@ function readReminders(senderId) {
 }
 
 function makeSharedTable(tableInfo) {
-  console.log(tableInfo);
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  });
+  client.connect();
+  client.query(`CREATE TABLE ${tableInfo.creatorListName}-${tableInfo.joinerListName} (
+    id SERIAL PRIMARY KEY,
+    username varchar(45) NOT NULL,
+    task varchar(80)
+  );`, (err, res) => {
+    if (err) { throw err;}
+
+    client.end();
+  });
+  let response = `Congrats!  You have now created a shared list called ${tableInfo.creatorListName}-${tableInfo.joinerListName}!
+          \nTo add a shared To-Do, say 'add .... to ${tableInfo.creatorListName}-${tableInfo.joinerListName}'`;
+  callSendAPI(tableInfo.creatorId, {
+    "text": response
+  });
+  callSendAPI(tableInfo.joinerId, {
+    "text": response
+  });
 }
 
 // Handles messaging_postbacks events
