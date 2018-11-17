@@ -17,6 +17,7 @@ const helpRequest = ['help', 'help me', 'what can you do?', 'what can you do'];
 const friendListRequest = ['start a list with friends', 'make a new friend list', 'make list with friends', 'make list with a friend', 'new friend list', 'start a new list with a friend', 'make new list', 'new list', 'make new friend list', 'start list with friend', 'start a list with a friend', 'start new list', 'start a new list'];
 let setListName = {};
 let connectorCode = {};
+let joinerSetListName = {};
 
 
 // Sets server port and logs message on success
@@ -80,11 +81,6 @@ function handleMessage(sender_psid, received_message) {
   let senderId = sender_psid.toString();
   // Check if the message contains text
   if (received_message.text) {
-    console.log('*********');
-    console.log(setListName, JSON.stringify(setListName), setListName[senderId]);
-    console.log('*********');
-    console.log(connectorCode, JSON.stringify(connectorCode));
-    console.log('*********');
     let reminderText = isReminder(received_message.text.toLowerCase());
     if (setListName[senderId]) {
       setListName[senderId] = false;
@@ -98,14 +94,21 @@ function handleMessage(sender_psid, received_message) {
         "text": randomString
       };
       connectorCode[randomString] = {creatorListName: listName, creatorId: senderId};
+    } else if (joinerSetListName[senderId]) {
+      joinerSetListName[senderId] = false;
+      let joinerListName = received_message.text;
+      let newTableObject = Object.keys(connectorCode).find(key => connectorCode[key].joinerId === senderId);
+      console.log(newTableObject);
+      // makeSharedTable(connectorCode[received_message.text])
     } else if (received_message.text.length === 8 && connectorCode[received_message.text]) {
       response = {
-        "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName}`
+        "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName} \nWhat would you like to call the list? (friend's name, nickname, or objective)`
       };
+      joinerSetListName[senderId] = true;
+      connectorCode[received_message.text].joinerId = senderId;
       // reset connectorCode to false for this string so it can be reused
       //instead of adding onto it, now is when you need to store to database
       // then instruct on how to use and message both ppl the instructions
-      connectorCode[received_message.text].joinerId = senderId;
     } else if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": `I LOVE YOU TOO!!!`
