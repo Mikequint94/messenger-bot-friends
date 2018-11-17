@@ -14,7 +14,7 @@ const greetings = ['hi', 'hello', 'hola', 'sup', 'whatsup', 'yo', 'hey', 'heyy',
 const lovingMessages = ['i love you', '143', 'i <3 you', 'i love u', 'i love you so much'];
 const requestReminders = ['what are my reminders?', 'what are my reminders', 'reminders list', 'tell me my reminders', 'what do I have scheduled?', 'reminders?'];
 const helpRequest = ['help', 'help me', 'what can you do?', 'what can you do'];
-const friendListRequest = ['start a list with friends', 'make a new friend list', 'make list with friends', 'make list with a friend', 'new friend list', 'start a new list with a friend', 'make new list', 'new list', 'make new friend list', 'start list with friend', 'start a list with a friend', 'start new list', 'start a new list'];
+const friendListRequest = ['start a list with friends', 'make a new friend list', 'make list with friends', 'make list with a friend', 'new friend list', 'start a new list with a friend', 'make new list', 'new list', 'make new friend list', 'start list with friend', 'start a list with a friend', 'start new list', 'start a new list', 'make a new list'];
 let setListName = {};
 let connectorCode = {};
 let joinerSetListName = {};
@@ -97,9 +97,11 @@ function handleMessage(sender_psid, received_message) {
     } else if (joinerSetListName[senderId]) {
       joinerSetListName[senderId] = false;
       let joinerListName = received_message.text;
-      let newTableObject = Object.keys(connectorCode).find(key => connectorCode[key].joinerId === senderId);
+      let newTableObject = connectorCode[Object.keys(connectorCode).find(key => connectorCode[key].joinerId === senderId)];
+      console.log('*******');
       console.log(newTableObject);
-      // makeSharedTable(connectorCode[received_message.text])
+      console.log('*******');
+      makeSharedTable(newTableObject);
     } else if (received_message.text.length === 8 && connectorCode[received_message.text]) {
       response = {
         "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName} \nWhat would you like to call the list? (friend's name, nickname, or objective)`
@@ -224,13 +226,12 @@ function readReminders(senderId) {
     ssl: true,
   });
   client.connect();
-  client.query(`SELECT * FROM reminderList WHERE username = '${senderId}';`, (err, res) => {
+  client.query(`SELECT * FROM reminderList WHERE username = '${senderId}' ORDER BY id;`, (err, res) => {
     if (err) {
       throw err;
     }
     if (res.rows) {
       res.rows.forEach(row => {
-        response += row.task + '\n';
         callSendAPI(senderId, {
           "text": row.task
         });
@@ -239,8 +240,11 @@ function readReminders(senderId) {
     }
     client.end();
   });
-  console.log(response);
   return response;
+}
+
+function makeSharedTable(tableInfo) {
+  console.log(tableInfo);
 }
 
 // Handles messaging_postbacks events
