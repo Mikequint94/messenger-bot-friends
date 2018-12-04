@@ -81,6 +81,9 @@ function handleMessage(sender_psid, received_message) {
   let senderId = sender_psid.toString();
   // Check if the message contains text
   if (received_message.text) {
+    console.log('!!!!!');
+    console.log(connectorCode);
+    console.log('!!!!!');
     let reminderText = isReminder(received_message.text.toLowerCase());
     if (setListName[senderId]) {
       setListName[senderId] = false;
