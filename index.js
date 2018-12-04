@@ -104,7 +104,7 @@ function handleMessage(sender_psid, received_message) {
       makeSharedTable(newTableObject);
     } else if (received_message.text.length === 8 && connectorCode[received_message.text]) {
       response = {
-        "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName} \nWhat would you like to call the list? (friend's name, nickname, or objective)`
+        "text": `Great!  You successfully joined the list your friend created and labeled ${connectorCode[received_message.text].creatorListName}.\nWhat would you like to call the list? (friend's name, nickname, or objective)`
       };
       joinerSetListName[senderId] = true;
       connectorCode[received_message.text].joinerId = senderId;
