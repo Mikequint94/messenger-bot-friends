@@ -37,6 +37,9 @@ app.post('/webhook', (req, res) => {
       // Get the sender PSID
       let sender_psid = webhook_event.sender.id;
       console.log('Sender PSID: ' + sender_psid);
+
+      // let relationalTable =
+
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
       if (webhook_event.message) {
@@ -60,6 +63,8 @@ app.get('/webhook', (req, res) => {
   console.log(req);
   console.log(req);
   console.log(req);
+  //if this has senderID, make personal tables here
+  // and also a personal relational table
   console.log(req);
   // Parse the query params
   let mode = req.query['hub.mode'];
@@ -235,6 +240,7 @@ function readReminders(senderId) {
   client.connect();
   client.query(`SELECT * FROM reminderList WHERE username = '${senderId}' ORDER BY id;`, (err, res) => {
     if (err) {throw err;}
+    console.log(res);
     if (res.rows) {
       let listItems = '';
       res.rows.forEach(row => {
