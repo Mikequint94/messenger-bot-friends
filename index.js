@@ -57,6 +57,10 @@ app.post('/webhook', (req, res) => {
 app.get('/webhook', (req, res) => {
   // Your verify token. Should be a random string.
   const VERIFY_TOKEN = "a4b8c15d16e23f42";
+  console.log(req);
+  console.log(req);
+  console.log(req);
+  console.log(req);
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];
@@ -114,6 +118,8 @@ function handleMessage(sender_psid, received_message) {
       // reset connectorCode to false for this string so it can be reused
       //instead of adding onto it, now is when you need to store to database
       // then instruct on how to use and message both ppl the instructions
+    } else if (received_message.text.toLowerCase().slice(0,3) === 'add') {
+      let addListName = received_message.text.split('to').slice(-1)[0].split(' ')[0];
     } else if (lovingMessages.indexOf(received_message.text.toLowerCase()) !== -1) {
       response = {
         "text": `I LOVE YOU TOO!!!`
